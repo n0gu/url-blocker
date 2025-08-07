@@ -1,19 +1,25 @@
 const DEFAULT_FILTER = '';
 
-function updateRules(urlFilter) {
-    if (urlFilter && urlFilter.trim()) {
-        chrome.declarativeNetRequest.updateDynamicRules({
-            removeRuleIds: [1],
-            addRules: [{
-                id: 1,
+function updateRules(filterString) {
+    const patterns = filterString.trim().split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
+    chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
+        const removeRuleIds = existingRules.map(rule => rule.id);
+        const addRules = patterns.map((pattern, index) => {
+            const rule = {
+                id: index + 1,
                 priority: 1,
                 action: { type: 'block' },
-                condition: { urlFilter: urlFilter, resourceTypes: ['script'] }
-            }]
+                condition: { resourceTypes: ['script'] }
+            };
+            if (pattern.startsWith('/') && pattern.endsWith('/') && pattern.length > 1) {
+                rule.condition.regexFilter = pattern.slice(1, -1);
+            } else {
+                rule.condition.urlFilter = pattern;
+            }
+            return rule;
         });
-    } else {
-        chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1], addRules: [] });
-    }
+        chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds, addRules });
+    });
 }
 
 function loadAndUpdateRules() {

@@ -6,8 +6,8 @@
 </head>
 <body>
     <h1>URL Blocker Options</h1>
-    <label for="urlFilter">URL Filter (leave empty to disable blocking):</label>
-    <input type="text" id="urlFilter" style="width:100%;" placeholder="e.g., https://example.com/script.js" />
+    <label for="urlFilter">URL Filters (leave empty to disable blocking):</label>
+    <textarea id="urlFilter" style="width:100%; height:100px;" placeholder="One pattern per line (exact URL or /regex/)"></textarea>
     <button id="save">Save</button>
     <div id="status" style="margin-top:10px;color:green;"></div>
     <script src="options.js"></script>
